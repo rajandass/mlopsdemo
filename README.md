@@ -2,31 +2,31 @@
 
 ## 📌 Overview
 
-This project demonstrates a **complete MLOps pipeline** — from model training to deployment on Azure with CI/CD.
+This project demonstrates a **production-ready MLOps pipeline** — from model training to automated deployment on Azure using CI/CD.
 
 It includes:
 
-* ML model training (Scikit-learn)
-* Experiment tracking (MLflow)
+* Model training (Scikit-learn)
+* Experiment tracking (MLflow - local)
 * API serving (FastAPI)
 * Monitoring & logging
 * Docker containerization
 * Cloud deployment (Azure Container Apps)
-* CI/CD pipeline (GitHub Actions)
+* CI/CD automation (GitHub Actions)
 
 ---
 
 ## 🏗️ Architecture
 
 ```
-Data → Train → Model → API → Docker → Azure → CI/CD → Monitoring
+Data → Train → Model → API → Docker → Azure → CI/CD → Monitoring → Retraining
 ```
 
 ---
 
 ## 🧠 Problem Statement
 
-Predict **customer churn** based on:
+Predict **customer churn** using:
 
 * Tenure
 * Monthly charges
@@ -36,15 +36,16 @@ Predict **customer churn** based on:
 
 ## 🛠️ Tech Stack
 
-| Layer     | Technology           |
-| --------- | -------------------- |
-| ML        | Scikit-learn         |
-| Tracking  | MLflow               |
-| API       | FastAPI              |
-| Container | Docker               |
-| Cloud     | Azure Container Apps |
-| CI/CD     | GitHub Actions       |
-| Logging   | JSON + File logs     |
+| Layer      | Technology                     |
+| ---------- | ------------------------------ |
+| ML         | Scikit-learn                   |
+| Tracking   | MLflow (local)                 |
+| API        | FastAPI                        |
+| Container  | Docker                         |
+| Cloud      | Azure Container Apps           |
+| Registry   | Azure Container Registry (ACR) |
+| CI/CD      | GitHub Actions                 |
+| Monitoring | JSON logs + Python script      |
 
 ---
 
@@ -53,21 +54,21 @@ Predict **customer churn** based on:
 ```
 mlopsdemo/
 │
-├── app.py                # FastAPI app
-├── train.py             # Model training
-├── monitor.py           # Drift detection + retraining
-├── model.pkl            # Saved model
+├── app.py                  # FastAPI app
+├── train.py               # Model training + MLflow logging
+├── monitor.py             # Drift detection + auto-retraining
+├── model.pkl              # Saved model (used in Docker)
 ├── requirements.txt
 ├── Dockerfile
 ├── .dockerignore
 ├── .gitignore
 └── .github/workflows/
-    └── deploy.yml       # CI/CD pipeline
+    └── deploy.yml         # CI/CD pipeline
 ```
 
 ---
 
-## ⚙️ Setup Instructions (Local)
+## ⚙️ Local Setup
 
 ### 1️⃣ Create Virtual Environment
 
@@ -122,9 +123,12 @@ docker run -p 8000:8000 churn-api
 
 ### Steps:
 
-1. Create Azure Container Registry (ACR)
-2. Push Docker image
-3. Deploy using:
+1. Create Resource Group
+2. Create Azure Container Registry (ACR)
+3. Push Docker image
+4. Deploy to Azure Container Apps
+
+### Example:
 
 ```
 az containerapp up --name churn-api-app \
@@ -136,9 +140,9 @@ az containerapp up --name churn-api-app \
 
 ---
 
-## 🔄 CI/CD Pipeline
+## 🔄 CI/CD Pipeline (GitHub Actions)
 
-Located in:
+### Location:
 
 ```
 .github/workflows/deploy.yml
@@ -146,13 +150,24 @@ Located in:
 
 ### Trigger:
 
-* Runs on every `git push`
+* Runs automatically on every `git push` to `main`
 
-### Actions:
+### Pipeline Steps:
 
-* Build Docker image
-* Push to Azure Container Registry
-* Deploy to Azure Container Apps
+1. Build Docker image
+2. Push image to Azure Container Registry
+3. Deploy to Azure Container Apps
+
+---
+
+## 🔐 GitHub Secrets Required
+
+| Secret            | Description            |
+| ----------------- | ---------------------- |
+| AZURE_CREDENTIALS | Service principal JSON |
+| ACR_LOGIN_SERVER  | `<acr>.azurecr.io`     |
+| ACR_USERNAME      | ACR name               |
+| ACR_PASSWORD      | ACR password           |
 
 ---
 
@@ -174,16 +189,16 @@ python monitor.py
 
 ## 🔁 Auto-Retraining
 
-If drift detected:
+If drift is detected:
 
 * Model retrains automatically
-* New version deployed
+* New model is generated
 
 ---
 
 ## 🧪 API Example
 
-### Request:
+### Request
 
 ```json
 {
@@ -193,7 +208,7 @@ If drift detected:
 }
 ```
 
-### Response:
+### Response
 
 ```json
 {
@@ -203,13 +218,23 @@ If drift detected:
 
 ---
 
-## 🔐 Production Improvements (Future)
+## ⚠️ Important Notes
 
-* MLflow server on Azure
-* Azure Blob for model storage
-* Authentication (JWT/API key)
-* Prometheus + Grafana dashboards
-* Canary deployments
+* Docker uses **model.pkl** (not MLflow registry) due to container isolation
+* MLflow tracking is local (not production setup)
+* `.gitignore` excludes logs, venv, and ML artifacts
+* `.dockerignore` reduces build size
+
+---
+
+## 🔮 Future Improvements
+
+* MLflow server on Azure (model registry)
+* Azure Blob Storage for model artifacts
+* Authentication (JWT / API key)
+* Monitoring dashboard (Prometheus + Grafana)
+* Blue-green deployment strategy
+* Data pipeline integration
 
 ---
 
@@ -222,9 +247,10 @@ If drift detected:
 ## ⭐ Key Highlights
 
 * End-to-end MLOps lifecycle
-* Cloud-native deployment
-* Automated CI/CD
+* Cloud deployment on Azure
+* Automated CI/CD pipeline
 * Monitoring + retraining
+* Production-ready architecture
 
 ---
 
@@ -233,9 +259,9 @@ If drift detected:
 This project demonstrates how to move from:
 
 ```
-ML Model → Production System
+ML Model → Production System → Automated Deployment
 ```
 
 ---
 
-⭐ If you find this useful, give it a star!
+⭐ If you found this useful, consider starring the repo!
