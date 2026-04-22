@@ -2,24 +2,24 @@
 
 ## 📌 Overview
 
-This project demonstrates a **production-ready MLOps pipeline** — from model training to automated deployment on Azure using CI/CD.
+This project demonstrates a **production-ready MLOps pipeline** — from model training to controlled deployment on Azure using CI/CD with **manual approval gates**.
 
 It includes:
 
-* Model training (Scikit-learn)
+* ML model training (Scikit-learn)
 * Experiment tracking (MLflow - local)
 * API serving (FastAPI)
 * Monitoring & logging
 * Docker containerization
 * Cloud deployment (Azure Container Apps)
-* CI/CD automation (GitHub Actions)
+* CI/CD pipeline with **approval workflow (GitHub Actions)**
 
 ---
 
 ## 🏗️ Architecture
 
 ```
-Data → Train → Model → API → Docker → Azure → CI/CD → Monitoring → Retraining
+Data → Train → Model → API → Docker → CI/CD → Azure → Monitoring → Retraining
 ```
 
 ---
@@ -63,7 +63,7 @@ mlopsdemo/
 ├── .dockerignore
 ├── .gitignore
 └── .github/workflows/
-    └── deploy.yml         # CI/CD pipeline
+    └── deploy.yml         # CI/CD pipeline with approval
 ```
 
 ---
@@ -140,27 +140,57 @@ az containerapp up --name churn-api-app \
 
 ---
 
-## 🔄 CI/CD Pipeline (GitHub Actions)
+## 🔄 CI/CD Pipeline (Controlled Deployment)
 
-### Location:
+### 📍 Location
 
 ```
 .github/workflows/deploy.yml
 ```
 
-### Trigger:
+### 🔁 Trigger
 
-* Runs automatically on every `git push` to `main`
+* Runs on every `git push` to `main`
 
-### Pipeline Steps:
+### ⚙️ Pipeline Flow
 
-1. Build Docker image
-2. Push image to Azure Container Registry
-3. Deploy to Azure Container Apps
+1. **Build Stage (Auto)**
+
+   * Build Docker image
+   * Push image to Azure Container Registry
+
+2. **Deploy Stage (Manual Approval Required)**
+
+   * Waits for approval via GitHub Environment
+   * Deploys to Azure Container Apps
 
 ---
 
-## 🔐 GitHub Secrets Required
+## 🔐 Deployment Approval (IMPORTANT)
+
+This project uses **GitHub Environments** to control deployments.
+
+### Setup:
+
+```
+GitHub → Settings → Environments → production
+```
+
+### Features:
+
+* Requires **manual approval before deployment**
+* Prevents accidental production updates
+* Enables safe release control
+
+### Approval Flow:
+
+```
+Git Push → Build → ⏸️ Waiting for Approval → Approve → Deploy
+```
+
+---
+
+## 🔑 GitHub Secrets Required
 
 | Secret            | Description            |
 | ----------------- | ---------------------- |
@@ -192,7 +222,7 @@ python monitor.py
 If drift is detected:
 
 * Model retrains automatically
-* New model is generated
+* Updated model is generated
 
 ---
 
@@ -222,19 +252,19 @@ If drift is detected:
 
 * Docker uses **model.pkl** (not MLflow registry) due to container isolation
 * MLflow tracking is local (not production setup)
-* `.gitignore` excludes logs, venv, and ML artifacts
-* `.dockerignore` reduces build size
+* Deployment requires manual approval
+* `.gitignore` and `.dockerignore` optimize builds
 
 ---
 
 ## 🔮 Future Improvements
 
-* MLflow server on Azure (model registry)
+* MLflow server on Azure (central model registry)
 * Azure Blob Storage for model artifacts
 * Authentication (JWT / API key)
 * Monitoring dashboard (Prometheus + Grafana)
 * Blue-green deployment strategy
-* Data pipeline integration
+* Multi-environment pipeline (dev/staging/prod)
 
 ---
 
@@ -248,8 +278,8 @@ If drift is detected:
 
 * End-to-end MLOps lifecycle
 * Cloud deployment on Azure
-* Automated CI/CD pipeline
-* Monitoring + retraining
+* CI/CD with manual approval
+* Monitoring + auto-retraining
 * Production-ready architecture
 
 ---
@@ -259,7 +289,7 @@ If drift is detected:
 This project demonstrates how to move from:
 
 ```
-ML Model → Production System → Automated Deployment
+ML Model → Controlled Deployment → Production System
 ```
 
 ---
