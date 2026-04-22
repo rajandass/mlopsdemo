@@ -1,0 +1,21 @@
+mkdir project
+cd project
+
+python -m venv venv
+venv\Scripts\activate   # or source venv/bin/activate
+
+# create requirements.txt
+pip install -r requirements.txt
+pip freeze > requirements.txt
+
+CSV Data → Clean → Train Model → Save Model → Track Results
+
+Step 1: Install Required Tools
+Step 2: Create Project Folder
+Step 3: Create Sample Dataset
+Step 4: Train Your First ML Model
+Step 5: View Experiment Tracking
+Step 6: Create Your First API
+Step 7: Test Prediction
+Step 8: (Optional Beginner MLOps Step) Docker
+
