@@ -19,3 +19,5 @@ Step 6: Create Your First API
 Step 7: Test Prediction
 Step 8: (Optional Beginner MLOps Step) Docker
 
+git remote add origin https://github.com/rajandass/mlopsdemo.git
+
